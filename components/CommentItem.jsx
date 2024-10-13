@@ -1,105 +1,81 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-import { hp } from '../helpers/common'
-import { theme } from '../constants/theme'
-import Avatar from './Avatar'
-import moment from 'moment'
-import Icon from '../assets/icons'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { theme } from '../constants/theme';
+import { hp } from '../helpers/common';
+import Avatar from './Avatar';
+import moment from 'moment';
 
 const CommentItem = ({
     item,
-    canDelete = false,
-    onDelete = () =>{}
+    onDelete,
+    highlight,
+    canDelete,
 }) => {
     const createdAt = moment(item?.created_at).format('MMM D');
-    const handleDelete = ()=>{
-        Alert.alert('Confirm', "Are you sure you want do this?", [
-            {
-                text: 'Cancel',
-                onPress: () => console.log('modal cancelled'),
-                style: 'cancel'
-            },
-            {
-                text: 'Delete',
-                onPress: () => onDelete(item), // Call the onLogout function
-                style: 'destructive'
-            }
-        ]);
-    }
-  return (
-    <View style={styles.container}>
-      <Avatar
-      uri={item?.user?.image}
-      />
-      <View style={styles.content}>
-        <View style={{flexDirection: 'row', justifyContent:'space-between', alignItems:'center'}}>
-            <View style={styles.nameContainer}>
+
+    return (
+        <TouchableOpacity
+            style={[styles.container, highlight && styles.highlightedContainer]}
+            onPress={() => {/* Handle comment press, if needed */}}
+        >
+            {/* Avatar */}
+            <Avatar uri={item?.user?.image} size={hp(5)} />
+            <View style={styles.nameTitle}>
                 <Text style={styles.text}>
-                    {
-                        item?.user?.name
-                    }
+                    {item?.user?.name}
                 </Text>
-                <Text>•</Text>
-                <Text style={[styles.text,{color: theme.colors.textLight}]}>
-                    {
-                       createdAt
-                    }
+                <Text style={[styles.text, { color: theme.colors.textDark }]}>
+                    {item.text}
                 </Text>
             </View>
-            {
-                canDelete &&(
-                    <TouchableOpacity onPress={handleDelete}>
-                        <Icon name = "delete"size={20} color={theme.colors.rose}/>
+            <Text style={[styles.text, { color: theme.colors.textLight }]}>
+                {createdAt}
+            </Text>
+            {/* Delete button */}
+            {canDelete && (
+                <TouchableOpacity onPress={() => onDelete(item)}>
+                    <Text style={styles.deleteText}>Delete</Text>
+                </TouchableOpacity>
+            )}
+        </TouchableOpacity>
+    );
+};
 
-                    </TouchableOpacity>
-                )
-            }
-            
-        </View>
-        <Text style ={[styles.text, {fontWeight: 'normal'}]}>
-            {item?.text}
-        </Text>
-      </View>
-    </View>
-  )
-}
-
-export default CommentItem
+export default CommentItem;
 
 const styles = StyleSheet.create({
-    
-container: { 
-    flex: 1,
-    flexDirection: 'row',
-    gap: 7,
-},
-content: {
-    backgroundColor: 'rgba(0,0,0,0.06)',
-    flex: 1,
-    gap: 5,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius:theme.radius.md,
-    borderCurve: 'continuous',
-},
-highlight: {
-    borderWidth: 0.2,
-    backgroundColor: 'white',
-    borderColor: theme.colors.dark,
-    shadowColor: theme.colors. dark,
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5
-},
-nameContainer: {
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 3,
-},
-text: {
-    fontSize: hp(1.6),
-    fontWeight: theme.fonts.medium, color: 
-    theme.colors.textDark,
-}
-})
+    container: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        backgroundColor: 'white', // Default background color
+        borderWidth: 0.5,
+        borderColor: theme.colors.darkLight,
+        padding: 15,
+        borderRadius: theme.radius.xxl,
+        borderCurve: 'continuous',
+    },
+    highlightedContainer: {
+        backgroundColor: 'white', // White background for highlighted comments
+        shadowColor: '#000', // Shadow color
+        shadowOffset: { width: 0, height: 2 }, // Offset for shadow
+        shadowOpacity: 0.3, // Shadow opacity
+        shadowRadius: 4, // Shadow radius
+        elevation: 5, // For Android shadow effect
+        borderColor: theme.colors.white, // Optional: Change border color when highlighted
+    },
+    nameTitle: {
+        flex: 1,
+        gap: 2,
+    },
+    text: {
+        fontSize: hp(1.6),
+        fontWeight: theme.fonts.medium,
+        color: theme.colors.text,
+    },
+    deleteText: {
+        color: theme.colors.danger,
+    }
+});
